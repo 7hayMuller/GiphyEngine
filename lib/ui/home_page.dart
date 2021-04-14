@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:giphy_io/ui/gif_page.dart';
 import 'package:http/http.dart' as http;
 
 class HomePage extends StatefulWidget {
@@ -58,34 +59,35 @@ class _HomePageState extends State<HomePage> {
                 onSubmitted: (text) {
                   setState(() {
                     _search = text;
+                    _offset = 0;
                   });
                 },
               )),
           Expanded(
               child: FutureBuilder(
-                future: _getGifs(),
-                builder: (context, snapshot) {
-                  switch (snapshot.connectionState) {
-                    case ConnectionState.waiting:
-                    case ConnectionState.none:
-                      return Container(
-                        width: 200.00,
-                        height: 200.00,
-                        alignment: Alignment.center,
-                        child: CircularProgressIndicator(
-                          valueColor:
+            future: _getGifs(),
+            builder: (context, snapshot) {
+              switch (snapshot.connectionState) {
+                case ConnectionState.waiting:
+                case ConnectionState.none:
+                  return Container(
+                    width: 200.00,
+                    height: 200.00,
+                    alignment: Alignment.center,
+                    child: CircularProgressIndicator(
+                      valueColor:
                           AlwaysStoppedAnimation<Color>(Colors.greenAccent),
-                          strokeWidth: 5.0,
-                        ),
-                      );
-                    default:
-                      if (snapshot.hasError)
-                        return Container();
-                      else
-                        return _createGifTable(context, snapshot);
-                  }
-                },
-              ))
+                      strokeWidth: 5.0,
+                    ),
+                  );
+                default:
+                  if (snapshot.hasError)
+                    return Container();
+                  else
+                    return _createGifTable(context, snapshot);
+              }
+            },
+          ))
         ],
       ),
     );
@@ -113,22 +115,32 @@ class _HomePageState extends State<HomePage> {
                 height: 300.0,
                 fit: BoxFit.cover,
               ),
+              onTap: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) =>
+                            GifPage(snapshot.data['data'][index])));
+              },
             );
           else {
             return Container(
               child: GestureDetector(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    Icon(Icons.add, color: Colors.amber, size: 70.0, ),
-                  ],
-                ),
-                onTap: () {
-                  setState(() {
-                    _offset += 19;
-                  });
-                }
-              ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      Icon(
+                        Icons.add,
+                        color: Colors.amber,
+                        size: 70.0,
+                      ),
+                    ],
+                  ),
+                  onTap: () {
+                    setState(() {
+                      _offset += 19;
+                    });
+                  }),
             );
           }
         });
